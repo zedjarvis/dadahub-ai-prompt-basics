@@ -1,0 +1,14 @@
+node_modules
+.pnpm-store
+.DS_Store
+.env
+.env.*
+!.env.example
+
+apps/*/node_modules
+apps/*/.next
+apps/*/dist
+apps/*/.slidev
+apps/*/exported
+apps/*/.env
+apps/*/.env.*

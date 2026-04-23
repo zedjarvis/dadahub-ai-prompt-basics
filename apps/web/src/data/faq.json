@@ -1,0 +1,74 @@
+[
+  {
+    "id": "mission",
+    "title": "Dada Devs mission",
+    "content": "Dada Devs creates pathways for African female engineers to transition into Bitcoin and open-source development through code, collaboration, and contribution.",
+    "tags": ["mission", "pathways", "bitcoin", "open source"]
+  },
+  {
+    "id": "program-track",
+    "title": "Mastering Bitcoin Dada Devs Track",
+    "content": "The Mastering Bitcoin Track is the foundational program. It helps participants build technical understanding of the Bitcoin protocol and contribute to the open-source ecosystem.",
+    "tags": ["program", "track", "mastering bitcoin", "foundation"]
+  },
+  {
+    "id": "who-can-apply",
+    "title": "Who can apply",
+    "content": "The program is designed for African women with a background in programming such as Python, Rust, or JavaScript, and for software engineers who want to transition into Bitcoin development.",
+    "tags": ["apply", "eligibility", "programming background"]
+  },
+  {
+    "id": "prior-experience",
+    "title": "Prior Bitcoin experience",
+    "content": "Prior Bitcoin experience is not required, but programming knowledge is expected.",
+    "tags": ["experience", "requirements", "bitcoin"]
+  },
+  {
+    "id": "program-structure",
+    "title": "Program structure",
+    "content": "The foundational Bitcoin track is structured as an 8-week progressive course covering cryptographic foundations, transactions, consensus, networking, scripting, security, scaling, and open-source workflow.",
+    "tags": ["structure", "8 weeks", "curriculum"]
+  },
+  {
+    "id": "why-join",
+    "title": "Why join Dada Devs",
+    "content": "Participants gain hands-on training, mentorship from experienced developers, real-world project experience, community support, and access to career or grant opportunities.",
+    "tags": ["benefits", "mentorship", "training", "community"]
+  },
+  {
+    "id": "get-involved",
+    "title": "How to get involved",
+    "content": "People can get involved by applying as a student, becoming a mentor, or partnering with Dada Devs to create more opportunities for African women in Bitcoin and open-source development.",
+    "tags": ["mentor", "partner", "student", "involved"]
+  },
+  {
+    "id": "contact",
+    "title": "Contact and partner inquiries",
+    "content": "General and partnership inquiries can be sent to info@dadadevs.com.",
+    "tags": ["contact", "email", "partner"]
+  },
+  {
+    "id": "how-we-build",
+    "title": "How Dada Devs builds",
+    "content": "Dada Devs focuses on engineering activation, ecosystem collaborations, open-source contribution, and a talent network that connects skilled engineers to protocol teams and open-source initiatives.",
+    "tags": ["how we build", "engineering", "collaboration", "talent network"]
+  },
+  {
+    "id": "dada-hub",
+    "title": "Dada Hub",
+    "content": "Dada Hub is presented as Africa's first physical Bitcoin developer space based in Kenya. It is intended for learning, collaboration, and community building.",
+    "tags": ["dada hub", "kenya", "residency", "space"]
+  },
+  {
+    "id": "next-tracks",
+    "title": "Next tracks coming soon",
+    "content": "Upcoming tracks mentioned by Dada Devs include Mastering Lightning, Advanced Security Practices, and Applied GitHub Collaboration.",
+    "tags": ["lightning", "security", "github", "coming soon"]
+  },
+  {
+    "id": "focus-area",
+    "title": "Why Dada Devs exists",
+    "content": "Dada Devs exists to increase women's participation in Bitcoin development and help African builders contribute to protocol-level and open-source work that reflects local realities.",
+    "tags": ["why", "women", "africa", "bitcoin"]
+  }
+]

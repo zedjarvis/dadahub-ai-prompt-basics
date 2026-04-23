@@ -1,0 +1,37 @@
+import type { Metadata } from "next";
+import { IBM_Plex_Mono, Space_Grotesk } from "next/font/google";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import "./globals.css";
+
+const spaceGrotesk = Space_Grotesk({
+  variable: "--font-space-grotesk",
+  subsets: ["latin"],
+});
+
+const ibmPlexMono = IBM_Plex_Mono({
+  variable: "--font-ibm-plex-mono",
+  subsets: ["latin"],
+  weight: ["400", "500"],
+});
+
+export const metadata: Metadata = {
+  title: "Dada Devs Workshop Assistant",
+  description: "Workshop chatbot demo with OpenAI, embeddings, semantic search, and cost-aware routing.",
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html
+      lang="en"
+      className={`${spaceGrotesk.variable} ${ibmPlexMono.variable} h-full antialiased`}
+    >
+      <body className="min-h-full flex flex-col">
+        <TooltipProvider>{children}</TooltipProvider>
+      </body>
+    </html>
+  );
+}
