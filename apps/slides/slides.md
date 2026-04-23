@@ -424,7 +424,7 @@ Prompting is product design.
 
 # The Simplest Useful Chatbot Flow
 
-<div class="flow mt-8">
+<div class="flow mt-5">
   <div class="node">User</div>
   <div class="arrow">→</div>
   <div class="node">Next.js UI</div>
@@ -436,7 +436,7 @@ Prompting is product design.
   <div class="node">Response</div>
 </div>
 
-<div class="grid-2 mt-10">
+<div class="grid-2 mt-5">
   <div class="card">
     <div class="mini-title">Keep</div>
     <ul class="tight">
@@ -541,7 +541,7 @@ Modern RAG chatbots still retrieve information, but LLMs replace the old fixed r
   <div class="node">Store site index</div>
 </div>
 
-<div class="grid-2 mt-10">
+<div class="grid-2 mt-4">
   <div class="card">
     <div class="mini-title">Source pages</div>
     <ul class="tight">
@@ -626,17 +626,59 @@ This is the key move: website text becomes structured records, then vectorized s
 <div class="flow mt-8">
   <div class="node">Question</div>
   <div class="arrow">→</div>
-  <div class="node">Retrieve notes</div>
+  <div class="node">Embed query</div>
   <div class="arrow">→</div>
-  <div class="node">Add context</div>
+  <div class="node">Retrieve top-k chunks</div>
+  <div class="arrow">→</div>
+  <div class="node">Pack context</div>
   <div class="arrow">→</div>
   <div class="node">Generate answer</div>
 </div>
 
-<div class="grid-3 mt-10">
-  <div class="card"><strong>Without retrieval</strong><br>General model knowledge</div>
-  <div class="card"><strong>With retrieval</strong><br>Answers grounded in your data</div>
-  <div class="card"><strong>Use cases</strong><br>Policies, FAQs, school rules, service info</div>
+<div class="grid-3 mt-8">
+  <div class="card">
+    <div class="mini-title">Retrieval step</div>
+    <p>We embed the user query, score it against the site index, and keep only the highest-similarity chunks.</p>
+  </div>
+  <div class="card">
+    <div class="mini-title">Grounding step</div>
+    <p>We inject retrieved chunks with page title, section, and URL so the model has bounded context.</p>
+  </div>
+  <div class="card">
+    <div class="mini-title">Generation step</div>
+    <p>The LLM synthesizes an answer from the retrieved evidence instead of relying only on parametric memory.</p>
+  </div>
+</div>
+
+---
+
+<div class="eyebrow">RAG</div>
+
+# What Actually Goes Into The Model Call
+
+<div class="grid-2 mt-8">
+  <div class="card">
+    <div class="mini-title">System prompt</div>
+    <ul class="tight">
+      <li>Persona instructions</li>
+      <li>Closed vs open scope rules</li>
+      <li>Use retrieved Dada Devs context when relevant</li>
+      <li>Say when support is missing</li>
+    </ul>
+  </div>
+  <div class="card">
+    <div class="mini-title">Retrieved context block</div>
+    <ul class="tight">
+      <li>Source title</li>
+      <li>Page and section labels</li>
+      <li>URL</li>
+      <li>Chunk text</li>
+    </ul>
+  </div>
+</div>
+
+<div class="accent-box mt-8">
+This is why RAG matters: the model is not searching the website live. We search first, then explicitly inject only the most relevant evidence into the prompt.
 </div>
 
 ---

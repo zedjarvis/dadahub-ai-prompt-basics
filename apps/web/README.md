@@ -17,10 +17,12 @@ Next.js full-stack demo app for the Dada Hub Residency AI workshop.
 - OpenAI API access through server-side route handlers
 - prompt engineering through selectable personas
 - `@` persona tagging in the composer
+- Dada Devs site scraping into a structured knowledge index
 - embeddings-based semantic retrieval
-- simple RAG grounding from a local FAQ dataset
+- simple RAG grounding from indexed Dada Devs content
 - cost-aware routing between cheaper and stronger models
 - thread title generation from the first user message
+- a semantic search lab that shows retrieval before generation
 
 ## Run Locally
 
@@ -58,6 +60,9 @@ EMBEDDING_MODEL=text-embedding-3-small
 - `src/app/api/chat/route.ts`
   chat route, RAG, scope handling, model routing
 
+- `src/app/api/retrieve/route.ts`
+  retrieval-only endpoint for the semantic search lab
+
 - `src/app/api/thread-title/route.ts`
   auto-generates chat thread titles
 
@@ -70,8 +75,29 @@ EMBEDDING_MODEL=text-embedding-3-small
 - `src/lib/router.ts`
   simple cost-aware model routing
 
-- `src/data/faq.json`
-  local knowledge base
+- `scripts/scrape-dadadevs.mjs`
+  builds the Dada Devs site index
+
+- `scripts/embed-kb.mjs`
+  generates embedding snapshots for the site index
+
+- `src/data/site-index.json`
+  structured knowledge base built from the Dada Devs website
+
+- `src/data/site-embeddings.json`
+  precomputed embeddings snapshot
+
+- `src/data/site-manifest.json`
+  page-level crawl manifest
+
+## Knowledge Base Refresh
+
+From the repo root:
+
+```bash
+pnpm --dir apps/web scrape:kb
+pnpm --dir apps/web embed:kb
+```
 
 ## Notes
 

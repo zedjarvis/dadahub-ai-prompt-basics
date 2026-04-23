@@ -12,8 +12,9 @@ Monorepo for Cedrouseroll OMondi's Dada Hub Residency workshop:
   Next.js full-stack workshop demo with:
   - OpenAI chat
   - persona-based prompting
+  - Dada Devs site scraping and indexing
   - embeddings for semantic retrieval
-  - simple RAG flow
+  - grounded RAG flow over indexed site content
   - cost-aware routing
   - assistant-ui chat interface
 
@@ -71,6 +72,13 @@ pnpm build:slides
 pnpm lint:web
 ```
 
+Web app data pipeline:
+
+```bash
+pnpm --dir apps/web scrape:kb
+pnpm --dir apps/web embed:kb
+```
+
 ## Requirement Coverage
 
 This repo is set up to support the original workshop brief:
@@ -85,7 +93,7 @@ This repo is set up to support the original workshop brief:
    Covered by the Next.js demo app at `/chat`.
 
 4. `Working with embeddings for semantic search`
-   Covered by the local FAQ dataset, embeddings model, and retrieval layer.
+   Covered by the Dada Devs site index, embeddings model, and retrieval layer.
 
 5. `Cost optimization strategies for African markets`
-   Covered by cheap-vs-standard model routing and limited retrieval/context.
+   Covered by cheap-vs-standard model routing, bounded retrieval depth, and limited context packing.
