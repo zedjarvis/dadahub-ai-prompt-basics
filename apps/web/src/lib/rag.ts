@@ -1,12 +1,12 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
 
-import faqEntries from "@/data/faq.json";
-import staticEmbeddings from "@/data/embeddings.json";
+import knowledgeEntries from "@/data/site-index.json";
+import staticEmbeddings from "@/data/site-embeddings.json";
 import { getOpenAIClient, models } from "@/lib/openai";
-import type { EmbeddedChunk, FaqEntry, RetrievedChunk } from "@/lib/types";
+import type { EmbeddedChunk, KnowledgeEntry, RetrievedChunk } from "@/lib/types";
 
-const entries = faqEntries as FaqEntry[];
+const entries = knowledgeEntries as KnowledgeEntry[];
 let cachedEmbeddings: EmbeddedChunk[] | null =
   (staticEmbeddings as EmbeddedChunk[]).length > 0
     ? (staticEmbeddings as EmbeddedChunk[])
@@ -23,8 +23,8 @@ function cosineSimilarity(a: number[], b: number[]) {
   return normalizedA.reduce((sum, value, index) => sum + value * normalizedB[index], 0);
 }
 
-function toChunkText(entry: FaqEntry) {
-  return `${entry.title}\n${entry.content}\nTags: ${entry.tags.join(", ")}`;
+function toChunkText(entry: KnowledgeEntry) {
+  return `${entry.pageTitle}\n${entry.section}\n${entry.title}\n${entry.content}\nTags: ${entry.tags.join(", ")}`;
 }
 
 async function computeKnowledgeBaseEmbeddings() {
@@ -63,6 +63,9 @@ export async function retrieveRelevantChunks(query: string, topK = 2) {
   const scored: RetrievedChunk[] = knowledgeBase
     .map((entry) => ({
       id: entry.id,
+      pageTitle: entry.pageTitle,
+      section: entry.section,
+      url: entry.url,
       title: entry.title,
       content: entry.content,
       score: cosineSimilarity(entry.embedding, queryEmbedding.data[0].embedding),
@@ -78,7 +81,7 @@ export async function retrieveRelevantChunks(query: string, topK = 2) {
 
 export async function saveEmbeddingsSnapshot() {
   const embeddings = await computeKnowledgeBaseEmbeddings();
-  const outputPath = path.join(process.cwd(), "src/data/embeddings.json");
+  const outputPath = path.join(process.cwd(), "src/data/site-embeddings.json");
 
   await fs.writeFile(outputPath, JSON.stringify(embeddings, null, 2));
 }

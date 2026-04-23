@@ -11,8 +11,14 @@ import { Thread } from "@/components/assistant-ui/thread";
 import { ThreadListSidebar } from "@/components/assistant-ui/threadlist-sidebar";
 import { ThreadTitleProvider } from "@/components/assistant-ui/thread-title-provider";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import knowledgeIndex from "@/data/site-index.json";
 import { defaultPersonaId, personas } from "@/lib/personas";
-import type { ChatDebug, ChatScopeMode, PersonaId } from "@/lib/types";
+import type {
+  ChatDebug,
+  ChatScopeMode,
+  PersonaId,
+  RetrievedChunk,
+} from "@/lib/types";
 
 const scopeModes: {
   id: ChatScopeMode;
@@ -37,6 +43,9 @@ export default function Chat() {
   const [personaId, setPersonaId] = useState<PersonaId>(defaultPersonaId);
   const [scopeMode, setScopeMode] = useState<ChatScopeMode>("closed");
   const [debug, setDebug] = useState<ChatDebug | null>(null);
+  const indexedPages = new Set(
+    knowledgeIndex.map((entry) => entry.url),
+  ).size;
 
   const runtime = useChatRuntime({
     transport: new AssistantChatTransport({
@@ -157,9 +166,39 @@ export default function Chat() {
                       <ul className="flex list-disc flex-col gap-2 pl-5 text-sm leading-6 text-muted-foreground">
                         <li>API access via one OpenAI key</li>
                         <li>Persona-based prompt design</li>
-                        <li>Embeddings for semantic retrieval</li>
+                        <li>Scrape, chunk, embed, then retrieve</li>
+                        <li>Embeddings before generation</li>
                         <li>Cheap vs stronger model routing</li>
                       </ul>
+                    </Panel>
+
+                    <Panel eyebrow="Embeddings" title="Knowledge base index">
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="rounded-2xl border border-border bg-background px-4 py-3">
+                          <p className="font-mono text-[0.7rem] uppercase tracking-[0.24em] text-muted-foreground">
+                            Indexed pages
+                          </p>
+                          <p className="mt-2 text-2xl font-semibold tracking-tight">
+                            {indexedPages}
+                          </p>
+                        </div>
+                        <div className="rounded-2xl border border-border bg-background px-4 py-3">
+                          <p className="font-mono text-[0.7rem] uppercase tracking-[0.24em] text-muted-foreground">
+                            Semantic chunks
+                          </p>
+                          <p className="mt-2 text-2xl font-semibold tracking-tight">
+                            {knowledgeIndex.length}
+                          </p>
+                        </div>
+                      </div>
+                      <p className="mt-4 text-sm leading-6 text-muted-foreground">
+                        Retrieval now searches a structured index of Dada Devs
+                        site content, not a hand-written FAQ.
+                      </p>
+                    </Panel>
+
+                    <Panel eyebrow="Embeddings" title="Semantic search lab">
+                      <SemanticSearchLab />
                     </Panel>
 
                     <Panel eyebrow="Debug" title="Routing and retrieval">
@@ -188,6 +227,10 @@ export default function Chat() {
                                 ? "Cheap / fast"
                                 : "Standard / stronger"
                             }
+                          />
+                          <DebugItem
+                            label="Retrieval depth"
+                            value={`${debug.retrievalDepth} chunk${debug.retrievalDepth === 1 ? "" : "s"}`}
                           />
                           <DebugItem
                             label="Top similarity"
@@ -219,6 +262,17 @@ export default function Chat() {
                                       {chunk.score.toFixed(3)}
                                     </span>
                                   </div>
+                                  <p className="mt-1 text-xs text-muted-foreground">
+                                    {chunk.pageTitle} · {chunk.section}
+                                  </p>
+                                  <a
+                                    className="mt-1 block text-xs text-[#F0570F] underline-offset-2 hover:underline"
+                                    href={chunk.url}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                  >
+                                    {chunk.url}
+                                  </a>
                                   <p className="mt-2 text-sm leading-6 text-muted-foreground">
                                     {chunk.content}
                                   </p>
@@ -230,7 +284,7 @@ export default function Chat() {
                       ) : (
                         <p className="text-sm leading-6 text-muted-foreground">
                           Send a message to see which model was chosen and which
-                          FAQ chunks were retrieved.
+                          site chunks were retrieved.
                         </p>
                       )}
                     </Panel>
@@ -239,7 +293,7 @@ export default function Chat() {
                       <ul className="flex list-disc flex-col gap-2 pl-5 text-sm leading-6 text-muted-foreground">
                         <li>Short factual queries use `gpt-4.1-nano`</li>
                         <li>Complex queries escalate to `gpt-4.1-mini`</li>
-                        <li>Only top 2 chunks are retrieved</li>
+                        <li>Tight queries retrieve 2 chunks, broader ones retrieve 3-4</li>
                         <li>`text-embedding-3-small` powers semantic search</li>
                         <li>
                           `Closed scope` keeps answers tighter and easier to
@@ -255,6 +309,134 @@ export default function Chat() {
         </SidebarProvider>
       </ThreadTitleProvider>
     </AssistantRuntimeProvider>
+  );
+}
+
+function SemanticSearchLab() {
+  const [query, setQuery] = useState(
+    "How does Dada Devs help developers move into Bitcoin open source?",
+  );
+  const [results, setResults] = useState<RetrievedChunk[]>([]);
+  const [topSimilarity, setTopSimilarity] = useState<number | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function runSearch() {
+    const trimmed = query.trim();
+    if (!trimmed) return;
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch("/api/retrieve", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query: trimmed }),
+      });
+
+      const data = (await response.json()) as {
+        chunks?: RetrievedChunk[];
+        topSimilarity?: number;
+        message?: string;
+      };
+
+      if (!response.ok) {
+        throw new Error(data.message ?? "Semantic search failed.");
+      }
+
+      setResults(data.chunks ?? []);
+      setTopSimilarity(data.topSimilarity ?? null);
+    } catch (searchError) {
+      setResults([]);
+      setTopSimilarity(null);
+      setError(
+        searchError instanceof Error
+          ? searchError.message
+          : "Semantic search failed.",
+      );
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className="flex flex-col gap-4">
+      <p className="text-sm leading-6 text-muted-foreground">
+        Run retrieval without generation to show what the embedding search is
+        actually matching.
+      </p>
+
+      <div className="rounded-2xl border border-border bg-background p-3">
+        <textarea
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          rows={3}
+          className="w-full resize-none bg-transparent text-sm leading-6 outline-none"
+          placeholder="Ask a semantic search question..."
+        />
+        <div className="mt-3 flex items-center justify-between gap-3">
+          <p className="text-xs text-muted-foreground">
+            Uses `text-embedding-3-small` and cosine similarity.
+          </p>
+          <button
+            type="button"
+            onClick={runSearch}
+            disabled={loading}
+            className="rounded-full bg-[#F0570F] px-4 py-2 text-sm font-medium text-white transition hover:bg-[#d84d0c] disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {loading ? "Searching..." : "Test retrieval"}
+          </button>
+        </div>
+      </div>
+
+      {topSimilarity !== null ? (
+        <div className="rounded-2xl border border-border bg-background px-4 py-3">
+          <p className="font-mono text-[0.7rem] uppercase tracking-[0.24em] text-muted-foreground">
+            Top similarity
+          </p>
+          <p className="mt-2 text-2xl font-semibold tracking-tight">
+            {topSimilarity.toFixed(3)}
+          </p>
+        </div>
+      ) : null}
+
+      {error ? (
+        <p className="text-sm leading-6 text-destructive">{error}</p>
+      ) : null}
+
+      {results.length > 0 ? (
+        <div className="flex flex-col gap-3">
+          {results.map((chunk) => (
+            <div
+              key={chunk.id}
+              className="rounded-2xl border border-border bg-background px-3 py-3"
+            >
+              <div className="flex items-center justify-between gap-3">
+                <strong className="text-sm">{chunk.title}</strong>
+                <span className="font-mono text-xs text-muted-foreground">
+                  {chunk.score.toFixed(3)}
+                </span>
+              </div>
+              <p className="mt-1 text-xs text-muted-foreground">
+                {chunk.pageTitle} · {chunk.section}
+              </p>
+              <a
+                className="mt-1 block text-xs text-[#F0570F] underline-offset-2 hover:underline"
+                href={chunk.url}
+                target="_blank"
+                rel="noreferrer"
+              >
+                {chunk.url}
+              </a>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                {chunk.content}
+              </p>
+            </div>
+          ))}
+        </div>
+      ) : null}
+    </div>
   );
 }
 

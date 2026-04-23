@@ -42,9 +42,9 @@ import {
 import type { FC } from "react";
 
 const starterPrompts = [
-  "Who can apply for the Dada Devs program?",
-  "What is Dada Hub and how is it relevant to the residency?",
-  "Compare the Bitcoin track with the upcoming Lightning track.",
+  "I’m a software engineer interested in Bitcoin open source. Compare Dada Devs pathways, Dada Hub, and mentoring options, then recommend my next step.",
+  "Using Dada Devs information only, explain how the residency, Dada Hub, and open-source contribution fit together.",
+  "Organize what applicants, mentors, and partners each need to know from the Dada Devs site, and cite the relevant pages.",
 ];
 
 export const Thread: FC = () => {

@@ -203,7 +203,7 @@ layout: cover
 From API access to a simple RAG chatbot
 </div>
 
-<div class="grid-2 mt-10">
+<div class="grid-2 mt-7">
   <div class="card">
     <div class="mini-title">Speaker</div>
     <div><strong>Cedrouseroll OMondi</strong></div>
@@ -310,15 +310,84 @@ EMBEDDING_MODEL=text-embedding-3-small
   <div class="card"><strong>Formula</strong><br>Role + Goal + Context + Constraints + Style</div>
 </div>
 
-<div class="compare mt-8">
-  <div class="bad">
-    <div class="mini-title">Weak</div>
-    <p>Help users with this business.</p>
-  </div>
-  <div class="good">
-    <div class="mini-title">Better</div>
-    <p>You are a helpful support assistant for a small Nairobi-based electronics shop. Keep replies short and clear.</p>
-  </div>
+<div class="accent-box mt-8">
+Good prompt = Role + Goal + Context + Constraints + Output style
+</div>
+
+---
+
+<div class="eyebrow">Weak vs Better Prompt</div>
+
+# Weak Prompt
+
+<div class="bad mt-8">
+  <div class="mini-title">Prompt</div>
+  <p>Help users with Dada Devs.</p>
+</div>
+
+<div class="card mt-8">
+  <div class="mini-title">What’s missing</div>
+  <ul class="tight">
+    <li>No assistant role</li>
+    <li>No audience or use case context</li>
+    <li>No rules about uncertainty</li>
+    <li>No required output structure</li>
+    <li>No examples of good answers</li>
+  </ul>
+</div>
+
+---
+
+<div class="eyebrow">Weak vs Better Prompt</div>
+
+# Better Prompt Structure
+
+<div class="good mt-8">
+  <div class="mini-title">Prompt</div>
+  <p><strong>Role:</strong> You are the Dada Devs Program Guide.</p>
+  <p><strong>Task:</strong> Help users understand pathways, eligibility, Dada Hub, workshops, mentorship, and partner opportunities.</p>
+  <p><strong>Context:</strong> Answer using retrieved Dada Devs website content when available. If the site content does not support a claim, say so.</p>
+  <p><strong>Constraints:</strong> Keep answers concise, practical, and accurate. Do not invent dates, requirements, or promises.</p>
+  <p><strong>Output format:</strong> Use short sections: <code>Answer</code>, <code>Recommended next step</code>, and <code>Sources used</code>.</p>
+</div>
+
+<div class="card mt-8">
+  <div class="mini-title">What’s added</div>
+  <ul class="tight">
+    <li>Clear role and task</li>
+    <li>Grounding rules for retrieval</li>
+    <li>Explicit constraints</li>
+    <li>Output structure</li>
+    <li>No ambiguity about behavior</li>
+  </ul>
+</div>
+
+---
+
+<div class="eyebrow">Weak vs Better Prompt</div>
+
+# Better Prompt Example
+
+<div class="good mt-8">
+  <div class="mini-title">Example input</div>
+  <p>How can I move from learning into Bitcoin open-source contribution?</p>
+</div>
+
+<div class="good mt-6">
+  <div class="mini-title">Example output</div>
+  <p><strong>Answer:</strong> Start with the pathway that matches your level, then use Dada Hub and mentorship opportunities to move into practical contribution.</p>
+  <p><strong>Recommended next step:</strong> Review the Pathways page and the Bitcoin track.</p>
+  <p><strong>Sources used:</strong> Pathways, Dada Hub.</p>
+</div>
+
+<div class="card mt-8">
+  <div class="mini-title">Why this is stronger</div>
+  <ul class="tight">
+    <li>Shows the exact response shape</li>
+    <li>Makes formatting more consistent</li>
+    <li>Sets expectations for grounded answers</li>
+    <li>Works well with retrieval-based chatbots</li>
+  </ul>
 </div>
 
 ---
@@ -417,6 +486,139 @@ Prompting is product design.
 
 ---
 
+<div class="eyebrow">Before LLMs</div>
+
+# How Chatbots Worked Before GPT-Style Models
+
+<div class="flow mt-8">
+  <div class="node">Tokenize text</div>
+  <div class="arrow">→</div>
+  <div class="node">TF-IDF vectors</div>
+  <div class="arrow">→</div>
+  <div class="node">Intent classifier</div>
+  <div class="arrow">→</div>
+  <div class="node">Pre-written response</div>
+</div>
+
+<div class="grid-2 mt-8">
+  <div class="card">
+    <div class="mini-title">Typical pipeline</div>
+    <ol class="tight">
+      <li>Split text into words, sentences, or paragraphs</li>
+      <li>Vectorize with TF-IDF across the corpus</li>
+      <li>Predict intent with models like Naive Bayes</li>
+      <li>Select a predefined answer for that intent</li>
+    </ol>
+  </div>
+  <div class="card">
+    <div class="mini-title">Main limitation</div>
+    <ul class="tight">
+      <li>Rigid response set</li>
+      <li>Weak handling of new phrasing</li>
+      <li>No real synthesis across documents</li>
+      <li>Heavy manual maintenance</li>
+    </ul>
+  </div>
+</div>
+
+<div class="accent-box mt-8">
+Modern RAG chatbots still retrieve information, but LLMs replace the old fixed response layer with grounded generation.
+</div>
+
+---
+
+<div class="eyebrow">Indexing</div>
+
+# How We Build The Knowledge Base
+
+<div class="flow mt-8">
+  <div class="node">Scrape Dada Devs pages</div>
+  <div class="arrow">→</div>
+  <div class="node">Chunk sections</div>
+  <div class="arrow">→</div>
+  <div class="node">Create embeddings</div>
+  <div class="arrow">→</div>
+  <div class="node">Store site index</div>
+</div>
+
+<div class="grid-2 mt-10">
+  <div class="card">
+    <div class="mini-title">Source pages</div>
+    <ul class="tight">
+      <li>Home, About, Pathways, Workshop, Contact</li>
+      <li>Dada Citadel, Mentor, Partner pages</li>
+      <li>Bitcoin track curriculum</li>
+      <li>Blog posts and related internal pages</li>
+    </ul>
+  </div>
+  <div class="card">
+    <div class="mini-title">Why this matters</div>
+    <ul class="tight">
+      <li>The chatbot answers from current org content</li>
+      <li>We can inspect exactly what was indexed</li>
+      <li>We avoid one giant prompt with all site text</li>
+      <li>Retrieval becomes teachable, not hidden</li>
+    </ul>
+  </div>
+</div>
+
+---
+
+<div class="eyebrow">Embeddings</div>
+
+# What Embeddings Are Doing Here
+
+<div class="grid-3 mt-8">
+  <div class="card">
+    <div class="mini-title">1. Convert</div>
+    <p>Each text chunk becomes a numeric vector using <code>text-embedding-3-small</code>.</p>
+  </div>
+  <div class="card">
+    <div class="mini-title">2. Compare</div>
+    <p>The user query is embedded too, then compared against all chunk vectors.</p>
+  </div>
+  <div class="card">
+    <div class="mini-title">3. Retrieve</div>
+    <p>The closest chunks by meaning are passed to the model as grounded context.</p>
+  </div>
+</div>
+
+<div class="accent-box mt-8">
+Embeddings are not the answer. They are the search layer that helps us find the right context cheaply.
+</div>
+
+---
+
+<div class="eyebrow">Embeddings</div>
+
+# From Scraped Text To Searchable Chunk
+
+<div class="grid-3 mt-8">
+  <div class="card">
+    <div class="mini-title">1. Scraped text</div>
+    <p><strong>Source page:</strong> Mastering Bitcoin track</p>
+    <p class="footer-note">Bitcoin Core Development Environment<br>Configuring the Core Build<br>Running a Bitcoin Node<br>A developer is needed for this session</p>
+  </div>
+  <div class="card">
+    <div class="mini-title">2. Chunked record</div>
+    <p><strong>Title:</strong> Mastering Bitcoin — Bitcoin Core</p>
+    <p><strong>Section:</strong> Bitcoin Core</p>
+    <p class="footer-note">Stored with URL, page title, section, tags, and chunk text.</p>
+  </div>
+  <div class="card">
+    <div class="mini-title">3. Converted</div>
+    <p><strong>Embedding vector:</strong></p>
+    <p class="footer-note"><code>[0.014, -0.083, 0.221, 0.057, ...]</code></p>
+    <p class="footer-note">The vector is long, but now this chunk can be compared by meaning instead of exact words.</p>
+  </div>
+</div>
+
+<div class="accent-box mt-5">
+This is the key move: website text becomes structured records, then vectorized search targets.
+</div>
+
+---
+
 <div class="eyebrow">RAG</div>
 
 # From Chatbot To Grounded Assistant
@@ -446,18 +648,39 @@ Prompting is product design.
 <div class="compare mt-8">
   <div class="card">
     <div class="mini-title">User asks</div>
-    <h3>How do I apply for the next cohort?</h3>
+    <h3>How can I move from learning into real Bitcoin open-source contribution?</h3>
   </div>
   <div class="card">
     <div class="mini-title">System retrieves</div>
-    <h3>Programs / who can apply</h3>
+    <h3>Pathways, Dada Hub, mentor and partner pages</h3>
+  </div>
+</div>
+
+<div class="accent-box mt-8">
+The retrieved pages do not need to repeat the same exact words. They just need to be close in meaning.
+</div>
+
+---
+
+<div class="eyebrow">Embeddings</div>
+
+# Keyword Search vs Semantic Search
+
+<div class="grid-2 mt-8">
+  <div class="card">
+    <div class="mini-title">Why keyword search is weak</div>
+    <p>The best source might not literally contain the same words as the user query.</p>
+  </div>
+  <div class="card">
+    <div class="mini-title">Why semantic search helps</div>
+    <p>The app can connect related ideas like pathways, contribution, residency, curriculum, and mentorship.</p>
   </div>
 </div>
 
 <div class="grid-3 mt-8">
-  <div class="card"><strong>Keyword search</strong><br>Exact words</div>
-  <div class="card"><strong>Semantic search</strong><br>Meaning and intent</div>
-  <div class="card"><strong>Embeddings</strong><br>Help find the right chunks</div>
+  <div class="card"><strong>Keyword search</strong><br>Finds exact terms</div>
+  <div class="card"><strong>Semantic search</strong><br>Finds related meaning</div>
+  <div class="card"><strong>Embedding match</strong><br>Shows which chunks are likely worth paying to send</div>
 </div>
 
 ---
@@ -481,14 +704,14 @@ Prompting is product design.
     <ul class="tight">
       <li>Use smaller models first</li>
       <li>Limit tokens</li>
-      <li>Retrieve less, not more</li>
+      <li>Retrieve only the top 2–4 relevant chunks</li>
       <li>Cache repeated answers</li>
     </ul>
   </div>
 </div>
 
 <div class="accent-box mt-8">
-Optimize for token budgets, mobile realities, and bandwidth limits.
+Optimize for token budgets, mobile realities, and bandwidth limits. In the demo, retrieval depth and model choice both change with query complexity.
 </div>
 
 ---
@@ -597,6 +820,45 @@ layout: default
 
 <div class="footer-note mt-6">
 Also used in this workflow: semantic retrieval, persona prompting, cost-aware routing, and local knowledge-base chunking.
+</div>
+
+---
+layout: default
+---
+
+<div class="eyebrow">Resources</div>
+
+# Embeddings And Open Models
+
+<div class="resource-list mt-8">
+  <div class="resource-item">
+    <strong>OpenAI Embeddings Guide</strong>
+    Official guide for creating and using embeddings
+    <br>
+    <a href="https://platform.openai.com/docs/guides/embeddings">platform.openai.com/docs/guides/embeddings</a>
+  </div>
+  <div class="resource-item">
+    <strong>Sentence Transformers</strong>
+    Strong open-source starting point for semantic search from scratch
+    <br>
+    <a href="https://www.sbert.net/docs/quickstart.html">sbert.net/docs/quickstart.html</a>
+  </div>
+  <div class="resource-item">
+    <strong>Hugging Face Hub</strong>
+    Explore pretrained models, embedding models, datasets, and transformers
+    <br>
+    <a href="https://huggingface.co/docs/hub/models">huggingface.co/docs/hub/models</a>
+  </div>
+  <div class="resource-item">
+    <strong>Ollama</strong>
+    Run open models locally, including Llama-family and other small models
+    <br>
+    <a href="https://docs.ollama.com/">docs.ollama.com</a>
+  </div>
+</div>
+
+<div class="accent-box mt-6">
+Good free path to explore after today: Sentence Transformers for embeddings, Hugging Face Hub for model discovery, and Ollama for local experimentation with open models.
 </div>
 
 ---

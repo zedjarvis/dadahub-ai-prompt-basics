@@ -62,18 +62,22 @@ export async function POST(request: Request) {
         : "closed";
     const sanitizedLatestText = stripMentionDirectives(latestText);
 
-    const retrieval = await retrieveRelevantChunks(sanitizedLatestText, 2);
+    const initialRetrieval = await retrieveRelevantChunks(sanitizedLatestText, 2);
     const decision = pickModelForQuery(
       sanitizedLatestText,
-      retrieval.topSimilarity,
+      initialRetrieval.topSimilarity,
     );
+    const retrieval =
+      decision.topK > initialRetrieval.chunks.length
+        ? await retrieveRelevantChunks(sanitizedLatestText, decision.topK)
+        : initialRetrieval;
 
     const contextBlock =
       retrieval.chunks.length > 0
         ? retrieval.chunks
             .map(
               (chunk, index) =>
-                `Source ${index + 1}: ${chunk.title}\n${chunk.content}`,
+                `Source ${index + 1}: ${chunk.title}\nPage: ${chunk.pageTitle}\nSection: ${chunk.section}\nURL: ${chunk.url}\n${chunk.content}`,
             )
             .join("\n\n")
         : "No additional retrieved context.";
@@ -84,6 +88,7 @@ export async function POST(request: Request) {
       model: decision.model,
       tier: decision.tier,
       routeReason: decision.reason,
+      retrievalDepth: decision.topK,
       topSimilarity: retrieval.topSimilarity,
       usedRag: retrieval.chunks.length > 0,
       retrievedChunks: retrieval.chunks,
@@ -108,10 +113,11 @@ If the user asks something general that is not covered by retrieved context, you
     const result = streamText({
       model: openai(decision.model),
       temperature: 0.4,
-      maxOutputTokens: 280,
+      maxOutputTokens: decision.maxOutputTokens,
       system: `${systemInstructions}
 
 Use the retrieved Dada Devs context when it is relevant. If the answer is not supported by the retrieved context, say what you do know and note uncertainty.
+If you used retrieved context, end with a short "Sources used" list that names the page titles or sections you relied on.
 
 Retrieved context:
 ${contextBlock}`,
